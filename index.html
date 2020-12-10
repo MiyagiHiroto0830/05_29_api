@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>test</title>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: calc(100%-102px);
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>位置情報取得＆MAP表示</h1>
+    <div id="map"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script
+        src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AhOcMyAaMLkeRMOnAG0AVGk_u6KVDhrVQfb0r4lXTzuJYsGviBozlictuu_a5YQg'
+        async defer>
+        </script>
+    <script>
+        let map;
+        // 現在地を取得する時のオプション
+        const option = {
+            enableHighAccuracy: true,
+            maximumAge: 20000,
+            timeout: 10000000,
+        };
+        function pushPin(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng)
+            const pin = new Microsoft.Maps.Pushpin(location, {
+                color: "navy",
+                visible: true,
+            });
+            map.entities.push(pin);
+        };
+
+        function generateInfobox(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng)
+            const infobox = new Microsoft.Maps.Infobox(location, {
+                title: "イマココ",
+                description: "Im here!!"
+            });
+            infobox.setMap(map);
+        };
+        // 現在地を中心にして地図を表示する関数
+        function mapsInit(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map = new Microsoft.Maps.Map("#map", {
+                center: {
+                    latitude: lat, longitude: lng
+                },
+                zoom: 12,
+            });
+            pushPin(lat, lng, map);
+            generateInfobox(lat, lng, map);
+        };
+
+        function showError(error) {
+            let e = "";
+            if (error.code == 1) {
+                e = "位置情報が許可されてません"
+            }
+            if (error.code == 2) {
+                e = "現在位置を特定できません"
+            }
+            if (error.code == 3) {
+                e = "位置情報を取得する前にタイムアウトになりました"
+            }
+            alert("error:" + e);
+        }
+        function GetMap() {
+            navigator.geolocation.getCurrentPosition(mapsInit, showError, option)
+        }
+        window.onload = function () {
+            GetMap();
+        }
+    </script>
+
+</body>
+
+</html>
